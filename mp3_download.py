@@ -26,8 +26,3 @@ class Music:
 		html_content = urllib.request.urlopen("http://www.youtube.com/results?search_query=" +  urllib.parse.quote(video_name.replace(" ","+"),encoding="utf8"))
 		search_results = re.search(r"watch\?v=(\S{11})", html_content.read().decode())
 		self.__mp3_from_youtube_url("http://www.youtube.com/watch?v="+str(search_results[0]))
-
-
-
-mus = Music()
-print(mus.handler("https://www.youtube.com/watch?v=ihjoLWZcFVY&ab_channel=FACE"))
