@@ -9,6 +9,7 @@ TOKEN = "1942863363:AAFfuRsNO-Ee_n--7t7Sno8NbXd3VdTWFN0"
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
+
 async def on_startup(_):
 	print("Bot online!")
 
@@ -35,4 +36,4 @@ async def echo_send(message: types.Message):
 
 
 if __name__ == '__main__':
-   executor.start_polling(dp,on_startup=on_startup)
+   executor.start_polling(dp,skip_updates=True,on_startup=on_startup)
