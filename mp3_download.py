@@ -3,7 +3,7 @@ import urllib.request
 import urllib.parse
 import re
 import os
-import validators
+from validators import url
 
 class Music:
 	def downloader(self, string):
@@ -13,16 +13,15 @@ class Music:
 
 		returns path to downloaded file
 		"""
-		if validators.url(string):
-			return self.__mp3_from_youtube_url(string)
-		else:
-			return self.__mp3_from_youtube_name(string)
-
+		if not url(string):
+			string = self.__find_url_by_name(string)
+		return self.__mp3_from_youtube_url(string)
+	
 
 	def __mp3_from_youtube_url(self, url:str):
 		return YouTube(url).streams.filter(only_audio=True).first().download(output_path=os.getcwd() + r'\music', filename="aboba.mp3")
 
-	def __mp3_from_youtube_name(self, video_name:str):
+	def __find_url_by_name(self, video_name:str):
 		html_content = urllib.request.urlopen("http://www.youtube.com/results?search_query=" +  urllib.parse.quote(video_name.replace(" ","+"),encoding="utf8"))
 		search_results = re.search(r"watch\?v=(\S{11})", html_content.read().decode())
-		self.__mp3_from_youtube_url("http://www.youtube.com/watch?v="+str(search_results[0]))
+		return "http://www.youtube.com/watch?v="+str(search_results[0])
