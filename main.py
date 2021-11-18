@@ -33,7 +33,8 @@ async def echo_send(message: types.Message):
     else:
         await bot.send_message(message.from_user.id, Music().find_url_by_name(message.text))
         file_path = Music().downloader(message.text)
-        mp3 = open(file_path, "rb")
-        await bot.send_audio(message.from_user.id, mp3)
+        with open(file_path, "rb") as mp3:
+        	await bot.send_audio(message.from_user.id, mp3)
+
 if __name__ == '__main__':
    executor.start_polling(dp,skip_updates=True,on_startup=on_startup)

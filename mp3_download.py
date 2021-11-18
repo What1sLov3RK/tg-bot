@@ -19,9 +19,10 @@ class Music:
 	
 
 	def __mp3_from_youtube_url(self, url:str):
-		return YouTube(url).streams.filter(only_audio=True).first().download(output_path=os.getcwd() + r'\music', filename="aboba.mp3")
+		return YouTube(url).streams.filter(only_audio=True).first().download(output_path=os.getcwd() + r'\music')
 
 	def find_url_by_name(self, video_name:str):
+		"""Returns the link to the first video found via youtube search"""
 		html_content = urllib.request.urlopen("https://www.youtube.com/results?search_query=" + urllib.parse.quote(video_name.replace(" ","+"),encoding="utf8"))
 		search_results = re.search(r"watch\?v=(\S{11})", html_content.read().decode())
 		return "https://www.youtube.com/"+str(search_results[0])
