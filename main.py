@@ -38,6 +38,7 @@ async def echo_send(message: types.Message):
         await bot.delete_message(message.chat.id, message.message_id)
         await bot.send_message(message.from_user.id, "WIP",reply_markup=nav.mainMenu)
     else:
+<<<<<<< HEAD
         html_content = urllib.request.urlopen("https://www.youtube.com/results?search_query=" + urllib.parse.quote(message.text.replace(" ", "+"),encoding="utf8"))
         search_results = re.search(r"watch\?v=(\S{11})", html_content.read().decode())
         link = "https://www.youtube.com/" + str(search_results[0])
@@ -45,6 +46,12 @@ async def echo_send(message: types.Message):
         path = YouTube(link).streams.filter(only_audio=True).first().download(output_path=os.getcwd() + r'\music')
         mp3 = open(path, "rb")
         await bot.send_audio(message.from_user.id, mp3)
+=======
+        await bot.send_message(message.from_user.id, Music().find_url_by_name(message.text))
+        file_path = Music().downloader(message.text)
+        with open(file_path, "rb") as mp3:
+        	await bot.send_audio(message.from_user.id, mp3)
+>>>>>>> e12b664c58090c942ec3582b313b0e07f0f9b9ba
 
 if __name__ == '__main__':
    executor.start_polling(dp,skip_updates=True,on_startup=on_startup)
