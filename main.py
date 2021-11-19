@@ -45,5 +45,8 @@ async def echo_send(message: types.Message):
         path = YouTube(link).streams.filter(only_audio=True).first().download(output_path=os.getcwd() + r'\music')
         mp3 = open(path, "rb")
         await bot.send_audio(message.from_user.id, mp3)
+
+
+
 if __name__ == '__main__':
    executor.start_polling(dp,skip_updates=True,on_startup=on_startup)
