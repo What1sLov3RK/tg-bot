@@ -43,7 +43,6 @@ async def command_search(message: types.Message):
 
 @dp.message_handler(state=States.MUSIC)
 async def download (message: types.Message):
-    print("boba")
     state = dp.current_state(chat=message.chat.id, user=message.from_user.id)
     if message.text == '🔙':
         await bot.delete_message(message.chat.id, message.message_id)
