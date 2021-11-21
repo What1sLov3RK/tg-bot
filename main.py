@@ -105,8 +105,7 @@ async def lyrics_search(message: types.Message):
             await bot.send_audio(message.from_user.id, mp3)
         await state.set_state(States.all()[0])
     else:
-        await bot.send_message(message.from_user.id,"No matches, sorry😥",reply_markup=nav.mainMenu)
-        await state.set_state(States.all()[0])
+        await bot.send_message(message.from_user.id,"No matches, sorry😥, repeat pls")
 
 
 async def shutdown(dispatcher: Dispatcher):
