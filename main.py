@@ -75,7 +75,7 @@ async def echo_send(message: types.Message):
     if message.text == 'Shazam!':
         await bot.send_message(message.from_user.id,"Lets do a little Shazam!",reply_markup=nav.menu2)
         await state.set_state(States.all()[3])
-    if message.text == 'Lyrics':
+    if message.text == 'Search by Lyrics':
         await bot.send_message(message.from_user.id,"Send some words from song pls",reply_markup=nav.menu2)
         await state.set_state(States.all()[1])
     if message.text == '🔎':
