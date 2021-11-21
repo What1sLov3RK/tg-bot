@@ -44,7 +44,6 @@ async def download (message: types.Message):
         return
     html_content = urllib.request.urlopen("https://www.youtube.com/results?search_query=" + urllib.parse.quote(message.text.replace(" ", "+"),encoding="utf8"))
     search_results = re.search(r"watch\?v=(\S{11})", html_content.read().decode())
-    print(search_results)
     link = "https://www.youtube.com/" + str(search_results[0])
     await bot.send_message(message.from_user.id, link)
     path = YouTube(link).streams.filter(only_audio=True).first().download(output_path=os.getcwd() + r'\music')
@@ -53,7 +52,6 @@ async def download (message: types.Message):
 
 @dp.message_handler(state=States.SHAZAM)
 async def shazam(message:types.Message):
-    print("pipe")
     state = dp.current_state(chat=message.chat.id, user=message.from_user.id)
     if message.text == '🔙':
         await bot.delete_message(message.chat.id, message.message_id)
