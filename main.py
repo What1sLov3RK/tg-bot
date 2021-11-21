@@ -14,9 +14,10 @@ import os
 class States(Helper):
     mode = HelperMode.snake_case
 
-    BASE = ListItem()
-    MUSIC = ListItem()
-    SHAZAM = ListItem()
+    BASE = ListItem()#0
+    MUSIC = ListItem()#2
+    SHAZAM = ListItem()#3
+    LYRICS = ListItem()#1?
 
 TOKEN = "1942863363:AAFfuRsNO-Ee_n--7t7Sno8NbXd3VdTWFN0"
 bot = Bot(token=TOKEN)
@@ -32,15 +33,6 @@ async def command_start(message: types.Message):
     state = dp.current_state(chat=message.chat.id, user=message.from_user.id)
     await bot.send_message(message.from_user.id , 'Hi! {0.first_name}, Im music bot!\n Use buttons below to find songs'.format(message.from_user), reply_markup=nav.mainMenu)
     await state.set_state(States.all()[0])
-
-
-@dp.message_handler(commands=['search'],state=States.BASE)
-async def command_search(message: types.Message):
-    state = dp.current_state(chat=message.chat.id, user=message.from_user.id)
-    await bot.delete_message(message.chat.id, message.message_id)
-    await bot.send_message(message.from_user.id,"Send author name or song name ",reply_markup=nav.menu2)
-    await state.set_state(States.all()[1])
-
 
 @dp.message_handler(state=States.MUSIC)
 async def download (message: types.Message):
@@ -68,6 +60,8 @@ async def shazam(message:types.Message):
         await state.set_state(States.all()[0])
         return
 
+
+
 @dp.message_handler(state=States.BASE)
 async def echo_send(message: types.Message):
     state = dp.current_state(chat=message.chat.id, user=message.from_user.id)
@@ -76,9 +70,26 @@ async def echo_send(message: types.Message):
     if message.text == '🔙':
         await bot.delete_message(message.chat.id, message.message_id)
         await bot.send_message(message.from_user.id, "Ok",reply_markup=nav.mainMenu)
+        await state.set_state(States.all()[0])
     if message.text == 'Shazam!':
         await bot.send_message(message.from_user.id,"Lets do a little Shazam!",reply_markup=nav.menu2)
+        await state.set_state(States.all()[3])
+    if message.text == 'Lyrics':
+        await bot.send_message(message.from_user.id,"Send some words from song pls",reply_markup=nav.menu2)
+        await state.set_state(States.all()[1])
+    if message.text == '🔎':
+        await bot.send_message(message.from_user.id,"Send song name or author's name",reply_markup=nav.menu2)
         await state.set_state(States.all()[2])
+
+@dp.message_handler(state=States.LYRICS)
+async def lyrics_search(message: types.Message):
+    print("pope")
+    state= dp.current_state(chat=message.chat.id, user= message.from_user.id)
+    if message.text == '🔙':
+        await bot.delete_message(message.chat.id, message.message_id)
+        await bot.send_message(message.from_user.id, "Ok",reply_markup=nav.mainMenu)
+        await state.set_state(States.all()[0])
+        return
 
 async def shutdown(dispatcher: Dispatcher):
     await dispatcher.storage.close()
