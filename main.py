@@ -70,6 +70,7 @@ async def shazam(message:types.Message):
 
 @dp.message_handler(state=States.BASE)
 async def echo_send(message: types.Message):
+    state = dp.current_state(chat=message.chat.id, user=message.from_user.id)
     if message.text == '❤️':
         await bot.send_message(message.from_user.id,"https://www.youtube.com/watch?v=Q0EnwSTytE0")
     if message.text == '🔙':
@@ -77,6 +78,7 @@ async def echo_send(message: types.Message):
         await bot.send_message(message.from_user.id, "Ok",reply_markup=nav.mainMenu)
     if message.text == 'Shazam!':
         await bot.send_message(message.from_user.id,"Lets do a little Shazam!",reply_markup=nav.menu2)
+        await state.set_state(States.all()[2])
 
 async def shutdown(dispatcher: Dispatcher):
     await dispatcher.storage.close()
