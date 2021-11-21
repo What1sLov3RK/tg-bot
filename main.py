@@ -100,7 +100,6 @@ async def lyrics_search(message: types.Message):
         song_name=song_name_url.group(1)
         html_content = urllib.request.urlopen("https://www.youtube.com/results?search_query=" + urllib.parse.quote(str(name+' - '+song_name).replace(" ", "+"),encoding="utf8"))
         search_results = re.search(r"watch\?v=(\S{11})", html_content.read().decode())
-        print(search_results)
         link = "https://www.youtube.com/" + str(search_results[0])
         await bot.send_message(message.from_user.id, link,reply_markup=nav.mainMenu)
         path = YouTube(link).streams.filter(only_audio=True).first().download(output_path=os.getcwd() + r'\music')
