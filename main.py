@@ -16,6 +16,7 @@ class States(Helper):
 
     BASE = ListItem()
     MUSIC = ListItem()
+    SHAZAM = ListItem()
 
 TOKEN = "1942863363:AAFfuRsNO-Ee_n--7t7Sno8NbXd3VdTWFN0"
 bot = Bot(token=TOKEN)
@@ -57,6 +58,15 @@ async def download (message: types.Message):
     with open(path, "rb") as mp3:
         await bot.send_audio(message.from_user.id, mp3)
 
+@dp.message_handler(state=States.SHAZAM)
+async def shazam(message:types.Message):
+    print("pipe")
+    state = dp.current_state(chat=message.chat.id, user=message.from_user.id)
+    if message.text == '🔙':
+        await bot.delete_message(message.chat.id, message.message_id)
+        await bot.send_message(message.from_user.id, "Ok",reply_markup=nav.mainMenu)
+        await state.set_state(States.all()[0])
+        return
 
 @dp.message_handler(state=States.BASE)
 async def echo_send(message: types.Message):
@@ -65,6 +75,8 @@ async def echo_send(message: types.Message):
     if message.text == '🔙':
         await bot.delete_message(message.chat.id, message.message_id)
         await bot.send_message(message.from_user.id, "Ok",reply_markup=nav.mainMenu)
+    if message.text == 'Shazam!':
+        await bot.send_message(message.from_user.id,"Lets do a little Shazam!",reply_markup=nav.menu2)
 
 async def shutdown(dispatcher: Dispatcher):
     await dispatcher.storage.close()
