@@ -10,6 +10,7 @@ import urllib.request
 import urllib.parse
 import re
 import os
+from shazam import shazam
 
 class States(Helper):
     mode = HelperMode.snake_case
@@ -51,13 +52,22 @@ async def download (message: types.Message):
         await bot.send_audio(message.from_user.id, mp3)
 
 @dp.message_handler(state=States.SHAZAM)
-async def shazam(message:types.Message):
+async def shazam(message:types.Voice):
     state = dp.current_state(chat=message.chat.id, user=message.from_user.id)
     if message.text == '🔙':
         await bot.delete_message(message.chat.id, message.message_id)
         await bot.send_message(message.from_user.id, "Ok",reply_markup=nav.mainMenu)
         await state.set_state(States.all()[0])
         return
+    if isinstance(message, types.Voice):
+        file = await bot.get_file(message.file_id)
+        file_path = file.file_path
+        await bot.download_file(file_path=file_path, destination_dir=os.getcwd()+'/audio_to_shazam/', destination='shazam.ogg')
+        song_name = shazam("shazam.ogg")
+        await bot.send_message(message.from_user.id, song_name,reply_markup=nav.mainMenu)
+    else:
+        await bot.send_message(message.from_user.id, "You must send the voice message!")
+    
 
 
 
