@@ -1,5 +1,7 @@
 from aiogram import Bot, types
+from config import BOT_KEY
 from aiogram.dispatcher import Dispatcher
+from aiogram.types.message import ContentType, Message
 from aiogram.utils import executor
 from aiogram.utils.helper import Helper, HelperMode, ListItem
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -10,7 +12,7 @@ import urllib.request
 import urllib.parse
 import re
 import os
-from shazam import shazam
+from shazam import shazam_audio
 
 class States(Helper):
     mode = HelperMode.snake_case
@@ -20,8 +22,7 @@ class States(Helper):
     SHAZAM = ListItem()#3
     LYRICS = ListItem()#1?
 
-TOKEN = "1942863363:AAFfuRsNO-Ee_n--7t7Sno8NbXd3VdTWFN0"
-bot = Bot(token=TOKEN)
+bot = Bot(token=BOT_KEY)
 dp = Dispatcher(bot, storage=MemoryStorage())
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -34,42 +35,6 @@ async def command_start(message: types.Message):
     state = dp.current_state(chat=message.chat.id, user=message.from_user.id)
     await bot.send_message(message.from_user.id , 'Hi! {0.first_name}, Im music bot!\n Use buttons below to find songs'.format(message.from_user), reply_markup=nav.mainMenu)
     await state.set_state(States.all()[0])
-
-@dp.message_handler(state=States.MUSIC)
-async def download (message: types.Message):
-    state = dp.current_state(chat=message.chat.id, user=message.from_user.id)
-    if message.text == '🔙':
-        await bot.delete_message(message.chat.id, message.message_id)
-        await bot.send_message(message.from_user.id, "Ok",reply_markup=nav.mainMenu)
-        await state.set_state(States.all()[0])
-        return
-    html_content = urllib.request.urlopen("https://www.youtube.com/results?search_query=" + urllib.parse.quote(message.text.replace(" ", "+"),encoding="utf8"))
-    search_results = re.search(r"watch\?v=(\S{11})", html_content.read().decode())
-    link = "https://www.youtube.com/" + str(search_results[0])
-    await bot.send_message(message.from_user.id, link)
-    path = YouTube(link).streams.filter(only_audio=True).first().download(output_path=os.getcwd() + r'\music')
-    with open(path, "rb") as mp3:
-        await bot.send_audio(message.from_user.id, mp3)
-
-@dp.message_handler(state=States.SHAZAM)
-async def shazam(message:types.Voice):
-    state = dp.current_state(chat=message.chat.id, user=message.from_user.id)
-    if message.text == '🔙':
-        await bot.delete_message(message.chat.id, message.message_id)
-        await bot.send_message(message.from_user.id, "Ok",reply_markup=nav.mainMenu)
-        await state.set_state(States.all()[0])
-        return
-    if isinstance(message, types.Voice):
-        file = await bot.get_file(message.file_id)
-        file_path = file.file_path
-        await bot.download_file(file_path=file_path, destination_dir=os.getcwd()+'/audio_to_shazam/', destination='shazam.ogg')
-        song_name = shazam("shazam.ogg")
-        await bot.send_message(message.from_user.id, song_name,reply_markup=nav.mainMenu)
-    else:
-        await bot.send_message(message.from_user.id, "You must send the voice message!")
-    
-
-
 
 @dp.message_handler(state=States.BASE)
 async def echo_send(message: types.Message):
@@ -89,6 +54,41 @@ async def echo_send(message: types.Message):
     if message.text == '🔎':
         await bot.send_message(message.from_user.id,"Send song name or author's name",reply_markup=nav.menu2)
         await state.set_state(States.all()[2])
+
+
+@dp.message_handler(state=States.MUSIC)
+async def download (message: types.Message):
+    state = dp.current_state(chat=message.chat.id, user=message.from_user.id)
+    if message.text == '🔙':
+        await bot.delete_message(message.chat.id, message.message_id)
+        await bot.send_message(message.from_user.id, "Ok",reply_markup=nav.mainMenu)
+        await state.set_state(States.all()[0])
+        return
+    html_content = urllib.request.urlopen("https://www.youtube.com/results?search_query=" + urllib.parse.quote(message.text.replace(" ", "+"),encoding="utf8"))
+    search_results = re.search(r"watch\?v=(\S{11})", html_content.read().decode())
+    link = "https://www.youtube.com/" + str(search_results[0])
+    await bot.send_message(message.from_user.id, link)
+    path = YouTube(link).streams.filter(only_audio=True).first().download(output_path=os.getcwd() + r'\music')
+    with open(path, "rb") as mp3:
+        await bot.send_audio(message.from_user.id, mp3)
+
+
+@dp.message_handler(state=States.SHAZAM, content_types=ContentType.VOICE)
+async def shazam(message:types.Voice):
+    file_path = await bot.download_file_by_id(message.voice.file_id, destination_dir=os.getcwd())
+    song_name = shazam_audio(file_path.name.split("/")[1])
+    await bot.send_message(message.from_user.id, song_name)
+
+@dp.message_handler(state=States.SHAZAM, content_types=ContentType.TEXT)
+async def shazam_menu(message:types.Message):
+    state = dp.current_state(chat=message.chat.id, user=message.from_user.id)
+    if message.text == '🔙':
+        await bot.delete_message(message.chat.id, message.message_id)
+        await bot.send_message(message.from_user.id, "Ok",reply_markup=nav.mainMenu)
+        await state.set_state(States.all()[0])
+        return
+    await bot.send_message(message.from_user.id, "You must send voice message!")
+
 
 @dp.message_handler(state=States.LYRICS)
 async def lyrics_search(message: types.Message):
