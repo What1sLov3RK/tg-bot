@@ -1,5 +1,5 @@
 from aiogram import Bot, types
-from config import BOT_TOKEN, VOICE_ROOT
+from config import BOT_TOKEN, PATH
 from aiogram.dispatcher import Dispatcher
 from aiogram.types.message import ContentType
 from aiogram.dispatcher.filters.state import State, StatesGroup
@@ -46,17 +46,14 @@ async def download (message: types.Message):
         await States.BASE.set()
         return
     link = manipulations.youtube_search(message.text)
-    await bot.send_message(message.from_user.id, link)
-    path = manipulations.youtube_download(link)
-    with open(path, "rb") as mp3:
-        await bot.send_audio(message.from_user.id, mp3)
+    await bot.send_message(message.from_user.id, link, reply_markup=nav.downloadmarkup)
     
 
 @dp.message_handler(state=States.SHAZAM, content_types=ContentType.VOICE)
 async def shazam(message:types.Voice):
-    file_path = await bot.download_file_by_id(message.voice.file_id, destination_dir=VOICE_ROOT)
-    song_name = manipulations.shazam_audio(file_path.name)
-    await bot.send_message(message.from_user.id, song_name)
+    file_path = await bot.download_file_by_id(message.voice.file_id, destination_dir=PATH)
+    song_name = manipulations.shazam_audio(file_path.name.split("/")[1])
+    await bot.send_message(message.from_user.id, song_name, reply_markup=nav.downloadmarkup)
 
 
 @dp.message_handler(state=States.SHAZAM, content_types=ContentType.TEXT)
@@ -76,16 +73,22 @@ async def lyrics_search(message: types.Message):
         await bot.send_message(message.from_user.id, msg.back_to_main_menu, reply_markup=nav.mainMenu)
         await States.BASE.set()
         return
-    print(message.text)
     search_results = manipulations.lyrics_search(message.text)
-    print(search_results)
-    if search_results is None:
+    if not search_results:
         await bot.send_message(message.from_user.id, msg.lyrics_search_no_matches)
         return
-    path = manipulations.youtube_download(manipulations.youtube_search(search_results))
-    with open(path, "rb") as m4a:
-        await bot.send_audio(message.from_user.id, m4a)
-        
+    await bot.send_message(message.from_user.id, search_results, reply_markup=nav.downloadmarkup)
+
+
+dp.callback_query_handler(lambda c: c.data == 'finish')
+async def download (callback_query: types.CallbackQuery):
+    await bot.answer_callback_query(callback_query.id)
+    link = manipulations.youtube_search(callback_query.message.text)
+    path = manipulations.youtube_download(link)
+    with open(path, "rb") as mp3:
+        await bot.send_audio(callback_query.message.from_user.id, mp3)
+
+
 
 async def shutdown(dispatcher: Dispatcher):
     await dispatcher.storage.close()
