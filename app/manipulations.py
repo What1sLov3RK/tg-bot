@@ -6,7 +6,7 @@ from config import API_KEY, MUSIC_ROOT
 
 
 def youtube_search(request):
-    html_content = requests.get("https://www.youtube.com/results?search_query=" + "+".join(request.split()), headers = {'User-agent': 'Reaper bot 0.1'})
+    html_content = requests.get("https://www.youtube.com/results?search_query=" + "+".join(request.split()), headers = {'User-agent': 'Reaper bot 1.1'})
     search_results = re.search(r"watch\?v=(\S{11})", html_content.text)
     return "https://www.youtube.com/" + str(search_results[0])
 
