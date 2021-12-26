@@ -2,8 +2,7 @@ from bs4 import BeautifulSoup as BS
 from pytube import YouTube
 import requests
 import re
-import os
-from config import API_KEY, MUSIC_ROOT, VOICE_ROOT
+from config import API_KEY, MUSIC_ROOT
 
 
 def youtube_search(request):
