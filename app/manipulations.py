@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup as BS
 from pytube import YouTube
 import requests
 import re
-from config import API_KEY, PATH
+from config import API_KEY, PATH, MUSIC_ROOT
 
 
 def youtube_search(request):
@@ -12,7 +12,7 @@ def youtube_search(request):
 
 
 def youtube_download(link):
-    return YouTube(link).streams.filter(only_audio=True).first().download(output_path=PATH + r'\music')
+    return YouTube(link).streams.filter(only_audio=True).first().download(output_path=MUSIC_ROOT)
      
 
 def lyrics_search(request:str):
