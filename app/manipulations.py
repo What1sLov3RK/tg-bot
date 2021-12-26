@@ -2,11 +2,11 @@ from bs4 import BeautifulSoup as BS
 from pytube import YouTube
 import requests
 import re
-from config import API_KEY, PATH, MUSIC_ROOT
+from config import API_KEY, MUSIC_ROOT, VOICE_ROOT
 
 
 def youtube_search(request):
-    html_content = requests.get("https://www.youtube.com/results?search_query=" + "+".join(request.split()))
+    html_content = requests.get("https://www.youtube.com/results?search_query=" + "+".join(request.split()), headers = {'User-agent': 'Reaper bot 0.1'})
     search_results = re.search(r"watch\?v=(\S{11})", html_content.text)
     return "https://www.youtube.com/" + str(search_results[0])
 
@@ -33,7 +33,7 @@ def shazam_audio(file_name):
 		'return': 'spotify',
 	}
 	files = {
-		'file': open(PATH + '/voice/' + file_name, 'rb'),
+		'file': open(VOICE_ROOT + file_name, 'rb'),
 	}
 	result = requests.post('https://api.audd.io/', data=data, files=files).json()
 	if result["status"] == "success" and result["result"]:
