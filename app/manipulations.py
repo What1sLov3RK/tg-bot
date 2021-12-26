@@ -38,5 +38,5 @@ def shazam_audio(file_name):
 	result = requests.post('https://api.audd.io/', data=data, files=files).json()
 	if result["status"] == "success" and result["result"]:
 		return result["result"]["artist"] +' - '+ result["result"]["title"]
-	return "Song not found"
+	return None
 	
