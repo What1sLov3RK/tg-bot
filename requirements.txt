@@ -2,3 +2,4 @@ aiogram
 pytube == 11.0.2
 requests
 bs4
+lxml
