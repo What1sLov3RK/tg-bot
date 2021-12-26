@@ -76,9 +76,12 @@ async def lyrics_search(message: types.Message):
         await bot.send_message(message.from_user.id, msg.back_to_main_menu, reply_markup=nav.mainMenu)
         await States.BASE.set()
         return
+    print(message.text)
     search_results = manipulations.lyrics_search(message.text)
-    if not search_results:
+    print(search_results)
+    if search_results is None:
         await bot.send_message(message.from_user.id, msg.lyrics_search_no_matches)
+        return
     path = manipulations.youtube_download(manipulations.youtube_search(search_results))
     with open(path, "rb") as m4a:
         await bot.send_audio(message.from_user.id, m4a)
