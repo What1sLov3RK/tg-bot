@@ -1,0 +1,7 @@
+aiogram
+pytube
+requests
+re
+bs4
+dataclasses
+os
