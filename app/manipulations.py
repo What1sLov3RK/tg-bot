@@ -16,7 +16,7 @@ def youtube_download(link):
      
 
 def lyrics_search(request:str):
-    response = requests.get('https://search.azlyrics.com/search.php?q=' + "+".join(request.split()))
+    response = requests.get('https://search.azlyrics.com/search.php?q=' + "+".join(request.split(' ')))
     html_content = BS(response.text, "lxml")
     rezult_panel = html_content.find('td', class_="text-left visitedlyr")
     if not rezult_panel:
