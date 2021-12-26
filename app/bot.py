@@ -80,8 +80,8 @@ async def lyrics_search(message: types.Message):
     await bot.send_message(message.from_user.id, search_results, reply_markup=nav.downloadmarkup)
 
 
-dp.callback_query_handler(lambda c: c.data == 'finish')
-async def download (callback_query: types.CallbackQuery):
+dp.callback_query_handler(lambda c: c.data == 'download')
+async def download_audio (callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     link = manipulations.youtube_search(callback_query.message.text)
     path = manipulations.youtube_download(link)
