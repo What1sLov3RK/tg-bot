@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup as BS
 from pytube import YouTube
 import requests
 import re
+import os
 from config import API_KEY, MUSIC_ROOT, VOICE_ROOT
 
 
@@ -33,7 +34,7 @@ def shazam_audio(file_name):
 		'return': 'spotify',
 	}
 	files = {
-		'file': open(VOICE_ROOT + file_name, 'rb'),
+		'file': open(os.path.join(VOICE_ROOT, file_name), 'rb'),
 	}
 	result = requests.post('https://api.audd.io/', data=data, files=files).json()
 	if result["status"] == "success" and result["result"]:
