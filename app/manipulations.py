@@ -19,6 +19,7 @@ def lyrics_search(request:str):
     response = requests.get('https://search.azlyrics.com/search.php?q=' + "+".join(request.split(' ')))
     html_content = BS(response.text, "lxml")
     rezult_panel = html_content.find('td', class_="text-left visitedlyr")
+    print(rezult_panel)
     if not rezult_panel:
         return None
     song_name = " - ".join(i.text.strip() for i in rezult_panel.find_all('b')[:2])
