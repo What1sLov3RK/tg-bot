@@ -34,7 +34,7 @@ def shazam_audio(file_name):
 		'return': 'spotify',
 	}
 	files = {
-		'file': open(os.path.join(VOICE_ROOT, file_name), 'rb'),
+		'file': open(file_name, 'rb'),
 	}
 	result = requests.post('https://api.audd.io/', data=data, files=files).json()
 	if result["status"] == "success" and result["result"]:

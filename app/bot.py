@@ -1,5 +1,5 @@
 from aiogram import Bot, types
-from config import BOT_TOKEN, PATH, VOICE_ROOT
+from config import BOT_TOKEN, VOICE_ROOT
 from aiogram.dispatcher import Dispatcher
 from aiogram.types.message import ContentType
 from aiogram.dispatcher.filters.state import State, StatesGroup
@@ -55,7 +55,7 @@ async def download (message: types.Message):
 @dp.message_handler(state=States.SHAZAM, content_types=ContentType.VOICE)
 async def shazam(message:types.Voice):
     file_path = await bot.download_file_by_id(message.voice.file_id, destination_dir=VOICE_ROOT)
-    song_name = manipulations.shazam_audio(file_path.name.split("/")[1])
+    song_name = manipulations.shazam_audio(file_path.name)
     await bot.send_message(message.from_user.id, song_name)
 
 
