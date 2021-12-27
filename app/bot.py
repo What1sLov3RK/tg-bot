@@ -46,8 +46,7 @@ async def download (message: types.Message):
         await bot.send_message(message.from_user.id, msg.back_to_main_menu,reply_markup=nav.mainMenu)
         await States.BASE.set()
         return
-    link = manipulations.youtube_search(message.text)
-    await bot.send_message(message.from_user.id, link, reply_markup=nav.downloadmarkup)
+    await bot.send_message(message.from_user.id, message.text, reply_markup=nav.downloadmarkup)
     await States.BUTTON.set()
 
     
@@ -93,7 +92,7 @@ async def lyrics_search(message: types.Message):
 async def download_audio (callback_query: types.CallbackQuery):
     print("ABOBA")
     await bot.answer_callback_query(callback_query.id)
-    link = manipulations.youtube_search(callback_query.message.text)
+    link = manipulations.youtube_search(callback_query.message.text, callback_query.message.from_user.username)
     path = manipulations.youtube_download(link)
     with open(path, "rb") as mp3:
         await callback_query.message.reply_audio(mp3, reply_markup=nav.mainMenu)
