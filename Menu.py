@@ -3,11 +3,12 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardBut
 
 btnSearch = KeyboardButton('🔎')
 btnFace = KeyboardButton('❤️')
-btnBack = KeyboardButton('🔙')
 btnShazam = KeyboardButton('Shazam!')
 btnLyrics = KeyboardButton("Search by Lyrics")
 mainMenu = ReplyKeyboardMarkup(resize_keyboard = True).add(btnFace,btnSearch,btnShazam,btnLyrics)
-menu2 = ReplyKeyboardMarkup(resize_keyboard = True).add(btnBack)
+
 
 downloadbutton = InlineKeyboardButton('Download audio', callback_data='download')
-downloadmarkup = InlineKeyboardMarkup(row_width=2).add(downloadbutton)
+backbutton = InlineKeyboardButton('Back', callback_data='back')
+downloadmarkup = InlineKeyboardMarkup(row_width=2).add(downloadbutton, backbutton)
+backmarkup = InlineKeyboardMarkup(row_width=2).add(backbutton)
