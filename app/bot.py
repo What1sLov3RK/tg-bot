@@ -1,6 +1,5 @@
-from asyncio.tasks import sleep
-from re import search
 from aiogram import Bot, types
+from aiogram.types import file
 import app.files as files
 from aiogram.dispatcher import Dispatcher
 from aiogram.types.message import ContentType
@@ -9,6 +8,8 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import Menu as nav
 import app.manipulations as manip
 from app.dialogs import msg
+from config import VOICE_ROOT
+import shutil
 
 class States(StatesGroup):
     BASE = State()
@@ -16,6 +17,7 @@ class States(StatesGroup):
     SHAZAM = State()
     LYRICS = State()
     BUTTON = State()
+
 
 bot = Bot(token=files.cnfg.BOT_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -31,6 +33,7 @@ async def command_start(message: types.Message):
 async def echo_send(message: types.Message):
     if message.text == 'Shazam!':
         await bot.send_message(message.from_user.id, msg.starting_shazam)
+        shutil.rmtree(VOICE_ROOT, ignore_errors=True)
         await States.SHAZAM.set()
     if message.text == 'Search by Lyrics':
         await bot.send_message(message.from_user.id, msg.lyrics_search_start)
@@ -68,7 +71,7 @@ async def download (message: types.Message):
 @dp.message_handler(state=States.SHAZAM, content_types=ContentType.VOICE)
 async def shazam(message:types.Voice):
     file_path = await bot.download_file_by_id(message.voice.file_id, destination_dir=files.cnfg.PATH)
-    song_name = manip.Shazam(file_path).find_song_info()
+    song_name = manip.Shazam(file_path.name).find_song_info()
     if song_name is None:
         await bot.send_message(message.from_user.id, "Song not found", reply_markup=nav.backmarkup)
         return

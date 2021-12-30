@@ -61,14 +61,15 @@ class Shazam:
         self.file = file_path
 
     def find_song_info(self):
-        data = {
-            'api_token': API_KEY,
-            'return': 'spotify',
-        }
-        files = {
-            'file': open(self.file, 'rb'),
-        }
-        result = requests.post(self.AUDD_API_LINK, data=data, files=files).json()
+        with open(self.file, 'rb') as f:
+            data = {
+                'api_token': API_KEY,
+                'return': 'spotify',
+            }
+            files = {
+                'file': f,
+            }
+            result = requests.post(self.AUDD_API_LINK, data=data, files=files).json()
         if result["status"] == "success" and result["result"]:
             return result["result"]["artist"] +' - '+ result["result"]["title"]
         return None
