@@ -8,6 +8,11 @@ headers = {
     'User-agent':
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19582'
 }
+azheaders = {
+    'User-agent': '*',
+    'Disallow' : '/lyricsdb/',
+    'Allow' : '/'
+}
 base = "https://www.azlyrics.com/"
 
 
@@ -22,7 +27,7 @@ def youtube_download(link):
      
 
 def lyrics_search(request:str):
-    response = requests.get('https://search.azlyrics.com/search.php?q=' + "+".join(request.split(' ')))
+    response = requests.get('https://search.azlyrics.com/search.php?q=' + "+".join(request.split(' ')), headers=headers)
     html_content = BS(response.text, "lxml")
     print(html_content)
     rezult_panel = html_content.find('td', class_="text-left visitedlyr")
