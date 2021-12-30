@@ -1,4 +1,5 @@
 from asyncio.tasks import sleep
+from re import search
 from aiogram import Bot, types
 import app.files as files
 from aiogram.dispatcher import Dispatcher
@@ -6,7 +7,7 @@ from aiogram.types.message import ContentType
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import Menu as nav
-import app.manipulations as manipulations
+import app.manipulations as manip
 from app.dialogs import msg
 
 class States(StatesGroup):
@@ -42,7 +43,9 @@ async def echo_send(message: types.Message):
 @dp.message_handler(state=States.LYRICS)
 async def lyrics_search(message: types.Message):
     if message.text:
-        search_results = manipulations.lyrics_search(message.text)
+        az = manip.Azlyr(message.text)
+        az.get_link()
+        search_results = az.get_song_info()
     if not search_results:
         await bot.send_message(message.from_user.id, msg.lyrics_search_no_matches, reply_markup=nav.backmarkup)
         return
@@ -52,14 +55,20 @@ async def lyrics_search(message: types.Message):
 
 @dp.message_handler(state=States.MUSIC)
 async def download (message: types.Message):
-    await bot.send_message(message.from_user.id, message.text, reply_markup=nav.downloadmarkup)
+    az = manip.Azlyr(message.text)
+    az.get_link()
+    song = az.get_song_info()
+    if not song:
+        await bot.send_message(message.from_user.id, msg.lyrics_search_no_matches, reply_markup=nav.backmarkup)
+        return
+    await bot.send_message(message.from_user.id, song, reply_markup=nav.downloadmarkup)
     await States.BUTTON.set()
 
 
 @dp.message_handler(state=States.SHAZAM, content_types=ContentType.VOICE)
 async def shazam(message:types.Voice):
     file_path = await bot.download_file_by_id(message.voice.file_id, destination_dir=files.cnfg.PATH)
-    song_name = manipulations.shazam_audio(file_path.name)
+    song_name = manip.Shazam(file_path).find_song_info()
     if song_name is None:
         await bot.send_message(message.from_user.id, "Song not found", reply_markup=nav.backmarkup)
         return
@@ -82,11 +91,11 @@ async def back (callback_query: types.CallbackQuery):
 @dp.callback_query_handler(lambda c: c.data == 'download', state=States.BUTTON)
 async def download_audio (callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
-    link = manipulations.youtube_search(callback_query.message.text)
-    path = manipulations.youtube_download(link)
+    link = manip.Youtube(callback_query.message.text).find_url()
+    path = manip.Youtube.download_audio(link)
     with open(path, "rb") as mp3:
         await callback_query.message.reply_audio(mp3, reply_markup=nav.mainMenu)
-
+    files.os.remove(path)
     await States.BASE.set()
 
 
