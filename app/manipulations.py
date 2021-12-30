@@ -4,9 +4,10 @@ import requests
 import re
 from config import API_KEY, MUSIC_ROOT
 
-agent = 'Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) \
-        Gecko/20100101 Firefox/24.0'
-headers = {'User-Agent': agent}
+headers = {
+    'User-agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19582'
+}
 base = "https://www.azlyrics.com/"
 
 
