@@ -3,8 +3,6 @@ from bs4 import BeautifulSoup as BS
 from pytube import YouTube
 import requests
 import re
-
-from requests.api import request
 from config import API_KEY, MUSIC_ROOT
 
 headers = {
